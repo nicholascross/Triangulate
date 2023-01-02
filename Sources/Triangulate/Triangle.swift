@@ -1,24 +1,24 @@
 import simd
 
 struct Triangle {
-    private var vertexA: Point
-    private var vertexB: Point
-    private var vertexC: Point
+    private var vertexA: Vertex
+    private var vertexB: Vertex
+    private var vertexC: Vertex
 
-    init(vertexA: Point, vertexB: Point, vertexC: Point) {
+    init(vertexA: Vertex, vertexB: Vertex, vertexC: Vertex) {
         self.vertexA = vertexA
         self.vertexB = vertexB
         self.vertexC = vertexC
     }
 
     // Find the circum-center of the bounding box
-    private var circumCenter: Point {
+    private var circumCenter: Vertex {
         let denominator: Float = 2 * (vertexA.x * (vertexB.y - vertexC.y) + vertexB.x * (vertexC.y - vertexA.y) + vertexC.x * (vertexA.y - vertexB.y))
 
         let circumCenterX: Float = ((vertexA.x * vertexA.x + vertexA.y * vertexA.y) * (vertexB.y - vertexC.y) + (vertexB.x * vertexB.x + vertexB.y * vertexB.y) * (vertexC.y - vertexA.y) + (vertexC.x * vertexC.x + vertexC.y * vertexC.y) * (vertexA.y - vertexB.y)) / denominator
         let circumCenterY: Float = ((vertexA.x * vertexA.x + vertexA.y * vertexA.y) * (vertexC.x - vertexB.x) + (vertexB.x * vertexB.x + vertexB.y * vertexB.y) * (vertexA.x - vertexC.x) + (vertexC.x * vertexC.x + vertexC.y * vertexC.y) * (vertexB.x - vertexA.x)) / denominator
 
-        let circumCenter = Point(x: circumCenterX, y: circumCenterY)
+        let circumCenter = Vertex(x: circumCenterX, y: circumCenterY)
         return circumCenter
     }
 
@@ -33,7 +33,7 @@ struct Triangle {
     }
 
     // Check if a point is inside the circum-circle of the triangle
-    func contains(_ point: Point) -> Bool {
+    func contains(_ point: Vertex) -> Bool {
         let distance = simd_distance(point, circumCenter)
         return distance <= circumRadius
     }
@@ -43,7 +43,7 @@ struct Triangle {
         [Edge(vertexA: vertexA, vertexB: vertexB), Edge(vertexA: vertexB, vertexB: vertexC), Edge(vertexA: vertexC, vertexB: vertexA)]
     }
 
-    var vertices: Set<Point> {
+    var vertices: Set<Vertex> {
         [vertexA, vertexB, vertexC]
     }
 }

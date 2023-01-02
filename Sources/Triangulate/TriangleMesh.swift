@@ -1,25 +1,32 @@
+/// A struct for generating Delaunay triangulations in Swift using the Bowyer-Watson algorithm.
+/// The TriangleMesh struct can be initialized with a list of points and will generate the indices for a Delaunay triangulation of those points.
+/// The vertices of the triangles are represented as simd_float2 values.
+/// Follows approach from pseudo code found here https://en.wikipedia.org/wiki/Bowyer–Watson_algorithm
 public struct TriangleMesh {
-    // A list of triangles that make up the triangle mesh
+    /// A list of triangles that make up the triangle mesh
     let triangles: [Triangle]
 
+    /// The indices property represents the indices of the points for each triangle in the mesh. Each index refers to a vertex in the vertices array.
     public let indices: [Int]
-    public let vertices: [Point]
 
-    // Initializes a new triangle mesh using the given list of points
-    public init(_ points: [Point]) {
+    /// The vertices property represents the points that make up the vertices of the triangles in the mesh.
+    public let vertices: [Vertex]
+
+    /// Initializes a new triangle mesh using the given list of points
+    public init(_ vertices: [Vertex]) {
         // Triangulates the points to create the triangles for the mesh
-        self.triangles = TriangleMesh.triangulatePoints(points)
+        self.triangles = TriangleMesh.triangulateVertices(vertices)
 
-        self.vertices = points
+        self.vertices = vertices
         self.indices = triangles.flatMap { triangle in
-            triangle.vertices.map { points.firstIndex(of: $0) }.compactMap { $0 }
+            triangle.vertices.map { vertices.firstIndex(of: $0) }.compactMap { $0 }
         }
     }
 
-    // Returns a list of triangles that triangulate the given points
-    private static func triangulatePoints(_ points: [Point]) -> [Triangle] {
+    /// Returns a list of triangles that triangulate the given points
+    private static func triangulateVertices(_ vertices: [Vertex]) -> [Triangle] {
         // Create a bounding box that encloses all the points
-        let boundingBox = BoundingBox(points: points)
+        let boundingBox = BoundingBox(vertices: vertices)
         // Create a super triangle that encloses the bounding box
         let superTriangle = boundingBox.enclosingTriangle
 
@@ -27,7 +34,7 @@ public struct TriangleMesh {
         var triangles: [Triangle] = [superTriangle]
 
         // Iterate through each point and add it to the triangulation
-        for point in points {
+        for point in vertices {
             // Find triangles that will be removed due to the insertion of the new point
             let badTriangles = findTrianglesWithPointInCircumCircle(triangles: triangles, point: point)
             // Find the boundary edges of the polygonal hole created by the removal of the bad triangles
@@ -65,7 +72,7 @@ public struct TriangleMesh {
         return trianglesFound
     }
 
-    private static func findTrianglesWithPointInCircumCircle(triangles: [Triangle], point: Point) -> [Triangle] {
+    private static func findTrianglesWithPointInCircumCircle(triangles: [Triangle], point: Vertex) -> [Triangle] {
         var badTriangles: [Triangle] = []
 
         // Find all the triangles that are no longer valid due to the insertion of the new point

@@ -1,8 +1,8 @@
 struct Edge {
-    let vertexA: Point
-    let vertexB: Point
+    let vertexA: Vertex
+    let vertexB: Vertex
 
-    var vertices: Set<Point> {
+    var vertices: Set<Vertex> {
         [vertexA, vertexB]
     }
 }
